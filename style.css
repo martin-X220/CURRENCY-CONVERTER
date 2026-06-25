@@ -85,9 +85,38 @@ button:hover {
   transform: translateY(-2px);
 }
 
-.result {
-  margin-top: 20px;
+/*Make the conversion result BIG and visible */
+#result, .result, #output{
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a73e8;
+  background: #e8f0fe;
+  padding: 20px;
+  border-radius: 12px;
   text-align: center;
-  font-size: 1.2rem;
-  color: var(--text-primary);
+  margin: 25px 0;
+  border: 2px solid #1a73e8;
+  box-shadow: 0 4px 6px rgba(26, 155, 232, 0.2);
+  transition:all 0.3s ease;
+}
+
+/* Add a pulse animation to the result when it updates */
+#result.show {
+  animation: pulse 0.5s ease-in-out;
+}
+
+
+@keyframes pulse {
+  0% { transform: scale(1);
+    box-shadow: 0 4px 6px rgba(26, 155, 232, 0.2); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Make mobile look good too */
+@media (max-width: 600px) {
+  #result, .result, #output {
+    font-size: 1.5rem;
+    padding: 15px;
+  }
 }

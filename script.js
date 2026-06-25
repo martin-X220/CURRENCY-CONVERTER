@@ -59,4 +59,8 @@ async function convertCurrency(e) {
   const convertedAmount = (amount * rate).toFixed(2);
 
   result.textContent = `${amount} ${fromCurrencyValue} = ${convertedAmount} ${toCurrencyValue}`;
+  result.classList.add("show");
+  setTimeout(() => {
+    result.classList.remove("show");
+  }, 5000);
 }
