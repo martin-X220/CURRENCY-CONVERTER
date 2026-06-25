@@ -29,13 +29,27 @@ body {
 
 .container {
   background-color: var(--bg-secondary);
-  padding: 30px 20px;
+  padding: 40px 20px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  width: 90%;          /* stops it from stretching wide */
-  max-width: 400px;    /* mobile friendly */
-  margin: 20px;        /* breathing room on edges */
+  width: 100%;          /* full width */
+  max-width: 600px;    /* caps it on desktop so text doesn't stretch too wide */
+  min-height: 100vh;    /* full height mobile */
+  margin: 20px;       
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* Center content vertically */
+}
+
+/* Mobile kill the gap, make it truly full height */
+@media (max-width: 600px) {
+  .container {
+    max-width: 100%; 
+    border-radius: 0;     /* no rounded corners on mobile */ 
+    min-height: 100vh;       
+    padding: 30px 16px;
+  }
 }
 
 h1 {
