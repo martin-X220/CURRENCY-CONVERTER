@@ -63,4 +63,21 @@ async function convertCurrency(e) {
   setTimeout(() => {
     result.classList.remove("show");
   }, 5000);
+
+  // update last updated time in lagos timezone
+  function updateLastUpdatedTime() {
+    const now = new Date(data.time_last_update_utc);
+    const time = now.toLocaleString("en-NG", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+      timeZone: "Africa/Lagos",
+    });
+    document.getElementById("last-updated").innerText =
+      `Last updated: ${time} WAT`;
+  }
+
+  // Call it when user converts
+  updateLastUpdatedTime();
 }
