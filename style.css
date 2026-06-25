@@ -16,22 +16,26 @@
 }
 
 body {
+  margin: 0;
+  padding: 0;
   background-color: var(--bg-primary);
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center;     /* Center horizontally */
+  align-items: center;        /* Center vertically */
   min-height: 100vh;
   padding: 20px;
   font-family: "Poppins", sans-serif;
 }
 
 .container {
-  width: 100%;
-  max-width: 400px;
   background-color: var(--bg-secondary);
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  padding: 30px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 90%;          /* stops it from stretching wide */
+  max-width: 400px;    /* mobile friendly */
+  margin: 20px;        /* breathing room on edges */
+  text-align: center;
 }
 
 h1 {
