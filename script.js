@@ -3,39 +3,53 @@ const fromCurrency = document.getElementById("from-currency");
 const toCurrency = document.getElementById("to-currency");
 const amountInput = document.getElementById("amount");
 const result = document.getElementById("result");
+const lastUpdated = document.getElementById("last-updated");
 
 window.addEventListener("load", fetchCurrencies);
 
-converter.addEventListener("submit", convertCurrency);
+if (converter) {
+  converter.addEventListener("submit", convertCurrency);
+}
 
 async function fetchCurrencies() {
-  // https://v6.exchangerate-api.com/v6/a9164ef9d7a054d50d4049f6/latest/USD
-  const response = await fetch(
-    "https://v6.exchangerate-api.com/v6/a9164ef9d7a054d50d4049f6/latest/USD",
-  );
-  const data = await response.json();
+  try {
+    const response = await fetch("https://open.er-api.com/v6/latest/USD");
+    if (!response.ok) {
+      throw new Error(`Request failed with ${response.status}`);
+    }
 
-  console.log("API Response:", data);
+    const data = await response.json();
+    const currencyOptions = Object.keys(data.rates || {});
 
-  if (!data.conversion_rates) {
-    console.error("Error fetching currencies:", data);
-    alert("Failed to fetch currency data. Check console for details.");
-    return;
+    if (!currencyOptions.length) {
+      throw new Error("No currency rates returned by the API.");
+    }
+
+    currencyOptions.forEach((currency) => {
+      const option1 = document.createElement("option");
+      option1.value = currency;
+      option1.textContent = currency;
+      fromCurrency.appendChild(option1);
+
+      const option2 = document.createElement("option");
+      option2.value = currency;
+      option2.textContent = currency;
+      toCurrency.appendChild(option2);
+    });
+
+    fromCurrency.value = "USD";
+    toCurrency.value = "NGN";
+  } catch (error) {
+    console.error("Error fetching currencies:", error);
+    if (result) {
+      result.textContent =
+        "Unable to load live rates right now. Please try again later.";
+      result.classList.add("show");
+    }
+    if (lastUpdated) {
+      lastUpdated.textContent = "Unable to load live rates right now.";
+    }
   }
-
-  const currencyOptions = Object.keys(data.conversion_rates);
-
-  currencyOptions.forEach((currency) => {
-    const option1 = document.createElement("option");
-    option1.value = currency;
-    option1.textContent = currency;
-    fromCurrency.appendChild(option1);
-
-    const option2 = document.createElement("option");
-    option2.value = currency;
-    option2.textContent = currency;
-    toCurrency.appendChild(option2);
-  });
 }
 
 async function convertCurrency(e) {
@@ -50,34 +64,47 @@ async function convertCurrency(e) {
     return;
   }
 
-  const response = await fetch(
-    `https://v6.exchangerate-api.com/v6/a9164ef9d7a054d50d4049f6/latest/${fromCurrencyValue}`,
-  );
-  const data = await response.json();
+  try {
+    const response = await fetch(
+      `https://open.er-api.com/v6/latest/${fromCurrencyValue}`,
+    );
+    if (!response.ok) {
+      throw new Error(`Request failed with ${response.status}`);
+    }
 
-  const rate = data.conversion_rates[toCurrencyValue];
-  const convertedAmount = (amount * rate).toFixed(2);
+    const data = await response.json();
+    const rate = data.rates?.[toCurrencyValue];
 
-  result.textContent = `${amount} ${fromCurrencyValue} = ${convertedAmount} ${toCurrencyValue}`;
-  result.classList.add("show");
-  setTimeout(() => {
-    result.classList.remove("show");
-  }, 5000);
+    if (typeof rate !== "number") {
+      throw new Error("Selected currency pair is not available.");
+    }
 
-  // update last updated time in lagos timezone
-  function updateLastUpdatedTime() {
-    const now = new Date(data.time_last_update_utc);
-    const time = now.toLocaleString("en-NG", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-      timeZone: "Africa/Lagos",
-    });
-    document.getElementById("last-updated").innerText =
-      `Last updated: ${time} WAT`;
+    const convertedAmount = (amount * rate).toFixed(2);
+
+    if (result) {
+      result.textContent = `${amount} ${fromCurrencyValue} = ${convertedAmount} ${toCurrencyValue}`;
+      result.classList.add("show");
+      setTimeout(() => {
+        result.classList.remove("show");
+      }, 5000);
+    }
+
+    if (lastUpdated) {
+      const updatedTime = new Date(data.time_last_update_utc);
+      const time = updatedTime.toLocaleString("en-NG", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+        timeZone: "Africa/Lagos",
+      });
+      lastUpdated.textContent = `Last updated: ${time} WAT`;
+    }
+  } catch (error) {
+    console.error("Error converting currency:", error);
+    if (result) {
+      result.textContent = "Conversion failed. Please try again.";
+      result.classList.add("show");
+    }
   }
-
-  // Call it when user converts
-  updateLastUpdatedTime();
 }
